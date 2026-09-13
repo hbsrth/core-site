@@ -259,8 +259,11 @@ export async function runInit(root, opts = {}) {
   // 5. Bağımlılıklar: kullanıcı ikinci bir komut yazmasın
   if (needsInstall && opts.install !== false) {
     say("… npm install çalışıyor");
-    const r = spawnSync(process.platform === "win32" ? "npm.cmd" : "npm", ["install", "--no-audit", "--no-fund"], { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
+    // Tek komut dizgesi: Windows'ta npm.cmd kabuk ister; argümanları ayrı vermek DEP0190 uyarısı üretiyor.
+    const r = spawnSync("npm install --no-audit --no-fund", { cwd: root, stdio: "inherit", shell: true });
     say(r.status === 0 ? "✔ bağımlılıklar kuruldu" : "✖ npm install başarısız; elle çalıştır: npm install");
-  } else if (needsInstall) say("· npm install atlandı (--no-install)");
+    say(r.status === 0 ? "\nSonraki: npx core-site check → npx core-site push-schema → npm run dev" : "");
+  } else if (needsInstall) say("· npm install atlandı (--no-install)\n\nSonraki: npm install → npx core-site check → npx core-site push-schema → npm run dev");
+  else say("\nSonraki: npx core-site check → npx core-site push-schema → npm run dev");
   return { log, root };
 }

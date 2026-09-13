@@ -141,8 +141,7 @@ const arg = positional[0];
 
 if (cmd === "init") {
   const r = await runInit(process.cwd(), { url: flags.url, site: flags.site, key: flags.key, secret: flags.secret, origin: flags.origin, force: Boolean(flags.force), update: Boolean(flags.update) });
-  for (const line of r.log) console.log(line);
-  if (!flags.update) console.log("\nSonraki: npm install → npx core-site check → npx core-site push-schema → npm run dev");
+  for (const line of r.log) if (line) console.log(line);
 } else if (cmd === "check") {
   if (process.env.CORE_CHECK === "off") console.log("core-site check atlandı (CORE_CHECK=off)");
   else {
