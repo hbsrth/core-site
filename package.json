@@ -1,0 +1,43 @@
+{
+  "name": "@surth/core-site",
+  "version": "0.1.0",
+  "description": "CORE'a bağlı bir Next.js sitesi için içerik istemcisi, canlı düzenleyici köprüsü, ziyaret izleyici, API rota yardımcıları ve bileşenler.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
+    }
+  },
+  "bin": {
+    "core-site": "./bin/core-site.mjs"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --import ./tests/register.mjs --test tests/*.test.mjs",
+    "release": "node scripts/release.mjs"
+  },
+  "peerDependencies": {
+    "next": ">=15",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5.8"
+  }
+}
