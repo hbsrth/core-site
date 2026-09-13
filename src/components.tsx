@@ -1,5 +1,7 @@
 /**
- * Sunucu bileşenleri: okur VE işaretler. Sayfa kodu tek satır yazar,
+ * Sunucu bileşenleri: okur VE işaretler. Ayrı giriş (`@surth/core-site/components`):
+ * `next/image` içe aktarır; kök giriş Next'siz ortamda (test, betik) da yüklenir.
+ * Sayfa kodu tek satır yazar,
  * canlı düzenleyici alanı kendiliğinden tanır.
  *
  *   <CoreText of={home} field="heroTitle" as="h1" className="…" />
@@ -12,6 +14,8 @@ import Image from "next/image";
 import { coreField, inlineText, type CoreAttr } from "./mark.js";
 import { getAt, refOf, type CoreLink } from "./types.js";
 import { resolveImage, type ResolvedImage } from "./server/client.js";
+import { sanitizeHtml } from "./sanitize.js";
+export { sanitizeHtml };
 
 function markFor(of: unknown, field: string, attr?: CoreAttr): Record<string, string> {
   const ref = refOf(of);
@@ -59,28 +63,6 @@ export function CoreImage({ of, field, alt, fallback = null, style, ...rest }: C
     style: { ...(position ? { objectPosition: position } : {}), ...style },
     ...markFor(of, field, "src"),
   } as ComponentProps<typeof Image>);
-}
-
-const ALLOWED_TAGS = new Set(["p", "br", "strong", "b", "em", "i", "u", "s", "a", "ul", "ol", "li", "h2", "h3", "h4", "blockquote", "hr", "code", "pre"]);
-
-/** Zengin metni güvenli HTML'e indirger: izinli etiketler, yalnız http(s)/mailto/tel bağlantı. */
-export function sanitizeHtml(html: string): string {
-  return html
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<(script|style|iframe|object|embed|svg|math)\b[\s\S]*?<\/\1>/gi, "")
-    .replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>/g, (whole, tag: string, attrs: string) => {
-      const t = tag.toLowerCase();
-      if (!ALLOWED_TAGS.has(t)) return "";
-      if (whole.startsWith("</")) return `</${t}>`;
-      if (t === "a") {
-        const href = /href\s*=\s*"([^"]*)"|href\s*=\s*'([^']*)'/i.exec(attrs);
-        const url = (href?.[1] ?? href?.[2] ?? "").trim();
-        const safe = /^(https?:\/\/|mailto:|tel:|\/|#)/i.test(url) ? url : "#";
-        const external = /^https?:\/\//i.test(safe);
-        return `<a href="${safe.replace(/"/g, "&quot;")}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>`;
-      }
-      return `<${t}>`;
-    });
 }
 
 export function CoreRichText({ of, field, as = "div", className }: { of: unknown; field: string; as?: ElementType; className?: string }) {

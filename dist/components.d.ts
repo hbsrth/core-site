@@ -1,5 +1,7 @@
 /**
- * Sunucu bileşenleri: okur VE işaretler. Sayfa kodu tek satır yazar,
+ * Sunucu bileşenleri: okur VE işaretler. Ayrı giriş (`@surth/core-site/components`):
+ * `next/image` içe aktarır; kök giriş Next'siz ortamda (test, betik) da yüklenir.
+ * Sayfa kodu tek satır yazar,
  * canlı düzenleyici alanı kendiliğinden tanır.
  *
  *   <CoreText of={home} field="heroTitle" as="h1" className="…" />
@@ -10,6 +12,8 @@
 import { type ComponentProps, type ElementType, type ReactNode } from "react";
 import Image from "next/image";
 import { type CoreLink } from "./types.js";
+import { sanitizeHtml } from "./sanitize.js";
+export { sanitizeHtml };
 export interface CoreTextProps {
     of: unknown;
     field: string;
@@ -52,8 +56,6 @@ export declare function CoreImage({ of, field, alt, fallback, style, ...rest }: 
     lazyBoundary?: string;
     lazyRoot?: string;
 } & import("react").RefAttributes<HTMLImageElement | null>> | null;
-/** Zengin metni güvenli HTML'e indirger: izinli etiketler, yalnız http(s)/mailto/tel bağlantı. */
-export declare function sanitizeHtml(html: string): string;
 export declare function CoreRichText({ of, field, as, className }: {
     of: unknown;
     field: string;

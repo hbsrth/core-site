@@ -62,7 +62,7 @@ export declare function readRows<T extends Record<string, unknown>>(rows: readon
  * `values` altında taşır, gömülü modüller (ürünler, kategoriler,
  * sayfalar, menü) düz nesne verir. Sürüklenme denetimi aynı.
  */
-export declare function readList<T extends Record<string, unknown>>(rows: readonly Record<string, unknown>[] | undefined | null, rowDefaults: T, fallback: readonly T[], label?: string): T[];
+export declare function readList<T extends Record<string, unknown>>(rows: readonly object[] | undefined | null, rowDefaults: T, fallback: readonly T[], label?: string): T[];
 /**
  * Satırları KİMLİKLERİYLE okur.
  *
@@ -75,9 +75,6 @@ export declare function readList<T extends Record<string, unknown>>(rows: readon
  * Yedek listeden gelen satırların kimliği boş: onlar CORE'da yok, yani
  * düzenlenemezler ve site onlara işaret koymamalı.
  */
-export declare function readKeyed<T extends Record<string, unknown>>(rows: readonly {
-    id?: unknown;
-    values?: Record<string, unknown>;
-}[] | undefined | null, rowDefaults: T, fallback: readonly T[], label?: string): (T & {
+export declare function readKeyed<T extends Record<string, unknown>>(rows: readonly object[] | undefined | null, rowDefaults: T, fallback: readonly T[], label?: string): (T & {
     id: string;
 })[];

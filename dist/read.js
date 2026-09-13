@@ -163,7 +163,7 @@ export function readRows(rows, rowDefaults, fallback, label = "koleksiyon") {
  * sayfalar, menü) düz nesne verir. Sürüklenme denetimi aynı.
  */
 export function readList(rows, rowDefaults, fallback, label = "modül") {
-    return readRows(rows?.map((values) => ({ values })), rowDefaults, fallback, label);
+    return readRows(rows?.map((values) => ({ values: values })), rowDefaults, fallback, label);
 }
 /**
  * Satırları KİMLİKLERİYLE okur.
@@ -184,9 +184,10 @@ export function readKeyed(rows, rowDefaults, fallback, label = "koleksiyon") {
             id: "",
         }));
     }
-    const values = readRows(rows.map((row) => ({ values: row.values ?? row })), rowDefaults, fallback, label);
+    const loose = rows;
+    const values = readRows(loose.map((row) => ({ values: row.values ?? row })), rowDefaults, fallback, label);
     return values.map((row, i) => ({
         ...row,
-        id: typeof rows[i].id === "string" ? rows[i].id : "",
+        id: typeof loose[i].id === "string" ? loose[i].id : "",
     }));
 }

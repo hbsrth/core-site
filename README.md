@@ -22,14 +22,14 @@ NEXT_PUBLIC_CORE_ORIGIN=https://core.surth.dev,http://localhost:3100
 
 ```ts
 // app/api/core/[...core]/route.ts
-import { createCoreHandlers } from "@surth/core-site/server";
+import { createCoreHandlers } from "@surth/core-site/route";
 export const { GET, POST } = createCoreHandlers();
 ```
 
 ```tsx
 // app/layout.tsx
 import { CoreProvider } from "@surth/core-site/client";
-import { CoreHead } from "@surth/core-site";
+import { CoreHead } from "@surth/core-site/components";
 import { settings } from "@surth/core-site/server";
 export default async function RootLayout({ children }) {
   const s = await settings();
@@ -45,7 +45,7 @@ export default async function RootLayout({ children }) {
 ```tsx
 // app/page.tsx
 import { singleton, collection } from "@surth/core-site/server";
-import { CoreText, CoreImage } from "@surth/core-site";
+import { CoreText, CoreImage } from "@surth/core-site/components";
 
 const HOME = { heroTitle: "Güçlü sistemler", heroText: "", heroImage: "" };
 
@@ -73,6 +73,16 @@ npx core-site push-schema     # CORE'a yazar, farkı gösterir
 npx core-site pull-schema     # CORE'daki şemayı yazdırır
 npx core-site doctor https://site.example   # içerik, sağlık ucu, sinyal
 ```
+
+## Girişler
+
+| Giriş | İçerik |
+|---|---|
+| `@surth/core-site` | okuma yardımcıları, `coreField`, `coreMetadata`, `sanitizeHtml`, tipler — `next` gerektirmez |
+| `@surth/core-site/server` | içerik istemcisi: `singleton`, `collection`, `modules`, `menu`, `settings`, `resolveImage` |
+| `@surth/core-site/route` | `createCoreHandlers` (`next/cache`) |
+| `@surth/core-site/components` | `CoreText`, `CoreImage`, `CoreRichText`, `CoreMenu`, `CoreHead` (`next/image`) |
+| `@surth/core-site/client` | `CoreProvider`, `CoreForm`, önizleme köprüsü |
 
 ## Rotalar (`createCoreHandlers`)
 

@@ -236,13 +236,13 @@ export function readRows<T extends Record<string, unknown>>(
  * sayfalar, menü) düz nesne verir. Sürüklenme denetimi aynı.
  */
 export function readList<T extends Record<string, unknown>>(
-  rows: readonly Record<string, unknown>[] | undefined | null,
+  rows: readonly object[] | undefined | null,
   rowDefaults: T,
   fallback: readonly T[],
   label = "modül",
 ): T[] {
   return readRows(
-    rows?.map((values) => ({ values })),
+    rows?.map((values) => ({ values: values as Record<string, unknown> })),
     rowDefaults,
     fallback,
     label,
@@ -262,10 +262,7 @@ export function readList<T extends Record<string, unknown>>(
  * düzenlenemezler ve site onlara işaret koymamalı.
  */
 export function readKeyed<T extends Record<string, unknown>>(
-  rows:
-    | readonly { id?: unknown; values?: Record<string, unknown> }[]
-    | undefined
-    | null,
+  rows: readonly object[] | undefined | null,
   rowDefaults: T,
   fallback: readonly T[],
   label = "koleksiyon",
@@ -276,14 +273,15 @@ export function readKeyed<T extends Record<string, unknown>>(
       id: "",
     }));
   }
+  const loose = rows as readonly { id?: unknown; values?: Record<string, unknown> }[];
   const values = readRows(
-    rows.map((row) => ({ values: row.values ?? (row as Record<string, unknown>) })),
+    loose.map((row) => ({ values: row.values ?? (row as Record<string, unknown>) })),
     rowDefaults,
     fallback,
     label,
   );
   return values.map((row, i) => ({
     ...row,
-    id: typeof rows[i].id === "string" ? (rows[i].id as string) : "",
+    id: typeof loose[i].id === "string" ? (loose[i].id as string) : "",
   }));
 }
