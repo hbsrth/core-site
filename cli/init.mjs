@@ -13,6 +13,7 @@
  * Var olan dosyanın üstüne yazmaz (--force hariç); ne yaptığını satır satır söyler.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ENV_KEYS, appDir } from "./shared.mjs";
@@ -215,8 +216,19 @@ export async function runInit(root, opts = {}) {
     }
   } else say("· .env.local için değer verilmedi; CORE panelindeki komutu ya da bloğu kullan");
 
-  // 4. package.json ve .gitignore
+  // 4. package.json ve .gitignore — boş klasörde en küçük Next projesi kurulur
   const pkgPath = join(root, "package.json");
+  let needsInstall = false;
+  if (!existsSync(pkgPath)) {
+    const name = (opts.site || root.split(/[\\/]/).filter(Boolean).pop() || "site").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "site";
+    writeFileSync(pkgPath, JSON.stringify({ name, version: "0.1.0", private: true, scripts: { dev: "next dev", build: "next build", start: "next start" }, dependencies: { next: "^16.3.3", react: "^19.2.8", "react-dom": "^19.2.8" }, devDependencies: { "@types/node": "^24", "@types/react": "^19", "@types/react-dom": "^19", typescript: "^5.9.3" } }, null, 2) + "\n");
+    say(`✔ package.json yazıldı (${name}: Next 16, React 19, TypeScript)`);
+    write("tsconfig.json", JSON.stringify({ compilerOptions: { target: "ES2017", lib: ["dom", "dom.iterable", "esnext"], allowJs: false, skipLibCheck: true, strict: true, noEmit: true, esModuleInterop: true, module: "esnext", moduleResolution: "bundler", resolveJsonModule: true, isolatedModules: true, jsx: "react-jsx", incremental: true, plugins: [{ name: "next" }], paths: { "@/*": ["./*"] } }, include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"], exclude: ["node_modules"] }, null, 2) + "\n");
+    write("next.config.ts", 'import type { NextConfig } from "next";\n\nconst nextConfig: NextConfig = {};\n\nexport default nextConfig;\n');
+    const giPath0 = join(root, ".gitignore");
+    if (!existsSync(giPath0)) write(".gitignore", "node_modules/\n.next/\nout/\n.vercel\n*.tsbuildinfo\nnext-env.d.ts\n");
+    needsInstall = true;
+  }
   if (existsSync(pkgPath)) {
     const j = JSON.parse(readFileSync(pkgPath, "utf8"));
     j.scripts ??= {};
@@ -229,18 +241,26 @@ export async function runInit(root, opts = {}) {
       j.dependencies ??= {};
       j.dependencies["@surth/core-site"] = TAG;
       changed = true;
-      say(`✔ package.json bağımlılık: @surth/core-site (${TAG}) — npm install çalıştır`);
+      needsInstall = true;
+      say(`✔ package.json bağımlılık: @surth/core-site (${TAG})`);
     }
     if (changed) {
       writeFileSync(pkgPath, JSON.stringify(j, null, 2) + "\n");
       say("✔ package.json scripts: core:check, core:doctor, prebuild → core-site check");
     } else say("· package.json güncel");
-  } else say("· package.json yok; önce `npx create-next-app@latest .` sonra tekrar `npx core-site init`");
+  }
   const giPath = join(root, ".gitignore");
   const gi = existsSync(giPath) ? readFileSync(giPath, "utf8") : "";
   if (!/\.env\*?\.local|\.env\.local/.test(gi)) {
     appendFileSync(giPath, `${gi && !gi.endsWith("\n") ? "\n" : ""}.env*.local\n`);
     say("✔ .gitignore: .env*.local");
   }
+
+  // 5. Bağımlılıklar: kullanıcı ikinci bir komut yazmasın
+  if (needsInstall && opts.install !== false) {
+    say("… npm install çalışıyor");
+    const r = spawnSync(process.platform === "win32" ? "npm.cmd" : "npm", ["install", "--no-audit", "--no-fund"], { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
+    say(r.status === 0 ? "✔ bağımlılıklar kuruldu" : "✖ npm install başarısız; elle çalıştır: npm install");
+  } else if (needsInstall) say("· npm install atlandı (--no-install)");
   return { log, root };
 }

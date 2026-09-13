@@ -10,4 +10,4 @@ export function readEnv(env = process.env) {
 export const configured = (e) => Boolean(e.url && e.siteId && e.token);
 /** Paketin konuştuğu sözleşme sürümü; CORE `x-core-contract` ile karşılaştırır. */
 export const CONTRACT_VERSION = 1;
-export const PACKAGE_VERSION = "0.2.0";
+export const PACKAGE_VERSION = "0.2.1";
