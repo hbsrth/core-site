@@ -2,6 +2,9 @@
 /**
  * core-site — sitenin komut satırı.
  *
+ *   npx core-site init [--url --site --key --secret --origin] [--force] [--update]
+ *                                       iskelet + AGENTS.md yönergesi + .env.local + scripts (--update yalnız yönergeyi tazeler)
+ *   npx core-site check [--strict]      kural denetimi; prebuild olarak koşar, ihlalde derleme durur
  *   npx core-site push-schema [dosya]   şemayı CORE'a gönderir (varsayılan core.schema.mjs | core.schema.json)
  *   npx core-site pull-schema           CORE'daki şemayı yazdırır
  *   npx core-site doctor [site-adresi]  bağlantıyı yoklar: içerik, sinyal ucu, sözleşme sürümü
@@ -13,6 +16,8 @@
 import { readFile, access } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
+import { runInit } from "../cli/init.mjs";
+import { printReport, runCheck } from "../cli/check.mjs";
 
 async function loadEnv() {
   for (const name of [".env.local", ".env"]) {
@@ -113,11 +118,32 @@ async function doctor(siteUrl) {
   }
 }
 
-const [cmd, arg] = process.argv.slice(2);
-if (cmd === "push-schema") await pushSchema(arg);
+const argv = process.argv.slice(2);
+const cmd = argv[0];
+const flags = {};
+const positional = [];
+for (const a of argv.slice(1)) {
+  const m = /^--([\w-]+)(?:=(.*))?$/.exec(a);
+  if (m) flags[m[1]] = m[2] ?? true;
+  else positional.push(a);
+}
+const arg = positional[0];
+
+if (cmd === "init") {
+  const r = await runInit(process.cwd(), { url: flags.url, site: flags.site, key: flags.key, secret: flags.secret, origin: flags.origin, force: Boolean(flags.force), update: Boolean(flags.update) });
+  for (const line of r.log) console.log(line);
+  if (!flags.update) console.log("\nSonraki: npm install → npx core-site check → npx core-site push-schema → npm run dev");
+} else if (cmd === "check") {
+  if (process.env.CORE_CHECK === "off") console.log("core-site check atlandı (CORE_CHECK=off)");
+  else {
+    const r = await runCheck(process.cwd(), { strict: Boolean(flags.strict) });
+    printReport(r);
+    if (!r.ok) process.exit(1);
+  }
+} else if (cmd === "push-schema") await pushSchema(arg);
 else if (cmd === "pull-schema") await pullSchema();
 else if (cmd === "doctor") await doctor(arg);
 else {
-  console.log("Kullanım: core-site push-schema [dosya] | pull-schema | doctor [site-adresi]");
+  console.log("Kullanım: core-site init | check | push-schema [dosya] | pull-schema | doctor [site-adresi]");
   process.exit(cmd ? 1 : 0);
 }

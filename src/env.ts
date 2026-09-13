@@ -29,4 +29,4 @@ export const configured = (e: CoreEnv) => Boolean(e.url && e.siteId && e.token);
 
 /** Paketin konuştuğu sözleşme sürümü; CORE `x-core-contract` ile karşılaştırır. */
 export const CONTRACT_VERSION = 1;
-export const PACKAGE_VERSION = "0.1.0";
+export const PACKAGE_VERSION = "0.2.0";

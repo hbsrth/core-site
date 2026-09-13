@@ -1,6 +1,6 @@
 {
   "name": "@surth/core-site",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CORE'a bağlı bir Next.js sitesi için içerik istemcisi, canlı düzenleyici köprüsü, ziyaret izleyici, API rota yardımcıları ve bileşenler.",
   "license": "UNLICENSED",
   "type": "module",
@@ -32,12 +32,15 @@
   "files": [
     "dist",
     "bin",
+    "cli",
+    "templates",
     "README.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --import ./tests/register.mjs --test tests/*.test.mjs",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs",
+    "prebuild": "node scripts/sync-protocol.mjs"
   },
   "peerDependencies": {
     "next": ">=15",

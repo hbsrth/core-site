@@ -1,3 +1,4 @@
+/* OTOMATIK KOPYA — kaynak: CORE/sdk/preview-protocol.ts; burada duzenleme, scripts/sync-protocol.mjs yeniden yazar. */
 /**
  * Canlı düzenleyicinin konuşma dili.
  *

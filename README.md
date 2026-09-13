@@ -2,23 +2,38 @@
 
 CORE'a bağlı bir Next.js sitesi için her şey tek pakette: içerik istemcisi, canlı düzenleyici köprüsü, ziyaret izleyici, API rotaları ve bileşenler.
 
-## Kurulum
+## Kurulum — tek komut
+
+CORE panelinde site ekleme sihirbazı bu komutu anahtar ve sırla dolu verir:
 
 ```bash
-npm i github:hbsrth/core-site#v0.1.0
+npm i github:hbsrth/core-site#v0.2.0 && npx core-site init --url=… --site=… --key=… --secret=… --origin=…
 ```
 
-`.env.local` (CORE'daki site ekleme sihirbazı bu bloğu verir):
+`init` boş klasörde ya da mevcut Next projesinde çalışır ve şunları yazar:
 
-```
-CORE_URL=https://core.surth.dev
-CORE_SITE_ID=site-kimligi
-CORE_API_KEY=core_live_…
-CORE_WEBHOOK_SECRET=…
-NEXT_PUBLIC_CORE_ORIGIN=https://core.surth.dev,http://localhost:3100
-```
+| Dosya | İş |
+|---|---|
+| `AGENTS.md` + `CLAUDE.md` | ajan yönergesi: içerik CORE'dan, tasarım koddan; işaretli blok, `init --update` tazeler |
+| `app/api/core/[...core]/route.ts` | dört rota |
+| `app/layout.tsx` | yoksa yazar, varsa `{children}`'ı `<CoreProvider>` ile sarar |
+| `core.schema.mjs` | siteye özgü alanların iskeleti |
+| `.env.local`, `.env.example` | beş değişken |
+| `package.json` | `core:check`, `core:doctor`, `prebuild → core-site check` |
 
-## Üç dosya
+Sonra: `npm install` → `npx core-site check` → `npx core-site push-schema` → `npm run dev`.
+
+## Denetim — `core-site check`
+
+Yönerge ne yapılacağını söyler, denetim yapılıp yapılmadığını. `npm run build`
+öncesi koşar; ihlal varsa derleme başlamaz (`CORE_CHECK=off` ile atlanır,
+`--strict` uyarıları da ihlal sayar). Baktıkları: `NEXT_PUBLIC_` ile sızan sır,
+rota ve `<CoreProvider>` varlığı, şema biçimi ve gömülü modül adları,
+`singleton()/collection()` çağrılarının şemayla uyumu (bilinmeyen kimlik,
+varsayılanda olmayan alan), `"use client"` dosyasında sunucu içe aktarımı,
+çıplak basılan CORE metni, elle `fetch`, eski rota adları.
+
+## Üç dosya (init'in yazdıkları)
 
 ```ts
 // app/api/core/[...core]/route.ts

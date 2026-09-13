@@ -18,4 +18,4 @@ export declare function readEnv(env?: NodeJS.ProcessEnv): CoreEnv;
 export declare const configured: (e: CoreEnv) => boolean;
 /** Paketin konuştuğu sözleşme sürümü; CORE `x-core-contract` ile karşılaştırır. */
 export declare const CONTRACT_VERSION = 1;
-export declare const PACKAGE_VERSION = "0.1.0";
+export declare const PACKAGE_VERSION = "0.2.0";
