@@ -46,6 +46,16 @@ function fail(message) {
   process.exit(1);
 }
 
+/** Ağ hatasını yığın dökümü yerine tek satır mesaja çevirir. */
+async function request(url, init) {
+  try {
+    return await fetch(url, init);
+  } catch (e) {
+    const cause = e?.cause?.code ?? e?.code ?? e?.message ?? "bilinmeyen";
+    fail(`CORE'a ulaşılamadı (${url}): ${cause}. CORE_URL doğru mu, panel ayakta mı?`);
+  }
+}
+
 async function exists(p) {
   try {
     await access(p);
@@ -71,7 +81,7 @@ async function pushSchema(file) {
   const env = await loadEnv();
   const schema = await loadSchema(file);
   if (!schema || !Array.isArray(schema.collections) || !Array.isArray(schema.singletons)) fail("Şema { profileId, version, features, locales, collections, singletons } biçiminde olmalı.");
-  const r = await fetch(`${env.url}/api/sites/${encodeURIComponent(env.siteId)}/schema`, {
+  const r = await request(`${env.url}/api/sites/${encodeURIComponent(env.siteId)}/schema`, {
     method: "PUT",
     headers: { authorization: `Bearer ${env.token}`, "x-core-secret": env.secret, "content-type": "application/json" },
     body: JSON.stringify({ schema }),
@@ -86,7 +96,7 @@ async function pushSchema(file) {
 
 async function pullSchema() {
   const env = await loadEnv();
-  const r = await fetch(`${env.url}/api/sites/${encodeURIComponent(env.siteId)}/schema`, { headers: { authorization: `Bearer ${env.token}`, "x-core-secret": env.secret } });
+  const r = await request(`${env.url}/api/sites/${encodeURIComponent(env.siteId)}/schema`, { headers: { authorization: `Bearer ${env.token}`, "x-core-secret": env.secret } });
   const body = await r.json().catch(() => ({}));
   if (!r.ok) fail(`CORE ${r.status}: ${body?.error?.message ?? "şema okunamadı"}`);
   console.log(JSON.stringify(body.schema, null, 2));
