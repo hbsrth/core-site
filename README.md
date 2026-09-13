@@ -7,7 +7,7 @@ CORE'a bağlı bir Next.js sitesi için her şey tek pakette: içerik istemcisi,
 CORE panelinde site ekleme sihirbazı bu komutu anahtar ve sırla dolu verir:
 
 ```bash
-npx -y -p github:hbsrth/core-site#v0.2.1 core-site init --url=… --site=… --key=… --secret=… --origin=…
+npx -y -p github:hbsrth/core-site#v0.2.2 core-site init --url=… --site=… --key=… --secret=… --origin=…
 # (değerler sihirbazdan dolu gelir; buradaki … yer tutucudur)
 ```
 

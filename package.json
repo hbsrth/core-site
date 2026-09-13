@@ -1,6 +1,6 @@
 {
   "name": "@surth/core-site",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "CORE'a bağlı bir Next.js sitesi için içerik istemcisi, canlı düzenleyici köprüsü, ziyaret izleyici, API rota yardımcıları ve bileşenler.",
   "license": "UNLICENSED",
   "type": "module",

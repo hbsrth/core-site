@@ -86,6 +86,8 @@ export function createCoreHandlers(options = {}) {
             configured: { url: Boolean(env.url), siteId: Boolean(env.siteId), apiKey: Boolean(env.token), webhookSecret: Boolean(env.webhookSecret), panelOrigin: Boolean(env.panelOrigins) },
             lastSignalAt,
             pendingVisits: buffer.length,
+            // Sır değil: hangi panelin mesajının kabul edileceği. Doktor, kendi kökenini burada arar.
+            panelOrigins: env.panelOrigins.split(",").map((s) => s.trim()).filter(Boolean),
         });
     }
     async function POST(request) {
